@@ -1,0 +1,15 @@
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: todoapp-api-{{ .Release.Namespace }}-ingress
+  namespace: {{ .Release.Namespace }}
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`todoapp-{{ .Release.Namespace }}-127-0-0-1.nip.io`)
+      priority: 10
+      services:
+        - name: "todoapp-api"
+          port: 80

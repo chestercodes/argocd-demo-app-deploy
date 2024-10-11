@@ -1,0 +1,57 @@
+{{ if (.Values.is_pr | default false) }}
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: aspire-dashboard-{{ .Release.Namespace }}-ingress
+spec:
+  entryPoints:
+    - web
+  routes:
+    - kind: Rule
+      match: Host(`dashboard-{{ .Release.Namespace }}-127-0-0-1.nip.io`)
+      priority: 10
+      services:
+        - name: "dashboard"
+          port: 80
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: dashboard
+spec:
+  ports:
+  - name: http
+    protocol: TCP
+    port: 80
+    targetPort: 18888
+  - name: otlp
+    protocol: TCP
+    port: 4317
+    targetPort: 18889
+  selector:
+    app: aspire-dashboard
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: aspire-dashboard-deployment
+  labels:
+    app: aspire-dashboard
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: aspire-dashboard
+  template:
+    metadata:
+      labels:
+        app: aspire-dashboard
+    spec:
+      containers:
+      - name: aspire-dashboard
+        image: mcr.microsoft.com/dotnet/aspire-dashboard:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 18888
+        - containerPort: 18889
+{{ end }}

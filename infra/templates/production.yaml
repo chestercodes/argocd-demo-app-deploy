@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-demo-app-production
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/chestercodes/argocd-demo-app-deploy.git
+    targetRevision: "{{ .Values.production_revision }}"
+    path: chart
+    helm:
+      valueFiles:
+      - values.yaml
+      values: |
+        image_tag: "{{ .Values.production_image_tag }}"
+        envname: production
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: production
+  syncPolicy:
+    automated:
+      selfHeal: true
+      prune: true
+    syncOptions:
+    - CreateNamespace=true

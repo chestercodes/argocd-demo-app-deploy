@@ -1,0 +1,21 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "todoapp-tests"
+  annotations:
+    argocd.argoproj.io/hook: PostSync
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "2"
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          #image: chestercodes/argocd-demo-app-end2end:{{ .Values.image_tag }}
+          image: busybox
+          command:
+            - /bin/sh
+            - -c
+            - 'echo "Pretend to run tests"'
+      restartPolicy: Never
+  backoffLimit: 1

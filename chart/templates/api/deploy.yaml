@@ -1,0 +1,55 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: todoapp-api-deployment
+spec:
+  selector:
+    matchLabels:
+      app: todoapp
+      tier: api
+  replicas: 2
+  revisionHistoryLimit: 2
+  template:
+    metadata:
+      labels:
+        app: todoapp
+        tier: api
+    spec:
+      containers:
+      - name: main
+        image: chestercodes/argocd-demo-app-api:{{ .Values.image_tag }}
+        resources:
+          requests:
+            memory: "100Mi"
+            cpu: "100m"
+          limits:
+            memory: "500Mi"
+            cpu: "500m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 3
+          periodSeconds: 3
+        env:
+        - name: ENVNAME
+          value: "{{ .Values.envname }}"
+        - name: IMAGE_TAG
+          value: "{{ .Values.image_tag }}"
+        - name: DB_HOST
+          value: "db"
+        - name: DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: db-postgresql
+              key: username
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: db-postgresql
+              key: user-password
+        - name: OTLP_ENDPOINT
+          value: "http://dashboard:4317"
+        ports:
+        - containerPort: 8080

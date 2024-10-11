@@ -1,0 +1,43 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ApplicationSet
+metadata:
+  name: demo-app-prs
+  namespace: argocd
+spec:
+  goTemplate: true
+  goTemplateOptions: ["missingkey=error"]
+  generators:
+  - pullRequest:
+      github:
+        owner: chestercodes
+        repo: argocd-demo-app
+      # time period to check for PR changes (default is 1800)
+      # it's easy to hit githubs unauthed api limit (60/hr), so use low numbers with care
+      requeueAfterSeconds: 600
+  template:
+    metadata:
+      # strange format is to escape the { and } in the helm template
+      name: 'demo-app-pr{{`{{.number}}`}}'
+    spec:
+      source:
+        repoURL: 'https://github.com/chestercodes/argocd-demo-app-deploy.git'
+        targetRevision: HEAD
+        path: chart/
+        helm:
+          parameters:
+          - name: "image_tag"
+            value: "pr-{{`{{.head_sha}}`}}"
+          - name: "envname"
+            value: "pr-{{`{{.number}}`}}"
+          - name: "is_pr"
+            value: "true"
+      project: "default"
+      destination:
+        server: https://kubernetes.default.svc
+        namespace: "pr-{{`{{.number}}`}}"
+      syncPolicy:
+        automated:
+          selfHeal: true
+          prune: true
+        syncOptions:
+        - CreateNamespace=true

@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: "todoapp-migrations"
+  annotations:
+    argocd.argoproj.io/hook-delete-policy: BeforeHookCreation
+    argocd.argoproj.io/sync-wave: "-2"
+  #   argocd.argoproj.io/hook: PreSync
+spec:
+  template:
+    spec:
+      containers:
+        - name: main
+          image: chestercodes/argocd-demo-app-migrations:{{ .Values.image_tag }}
+          env:
+          - name: DB_HOST
+            value: "db"
+          - name: DB_DATABASE
+            value: "todoapp"
+          - name: DB_USERNAME
+            valueFrom:
+              secretKeyRef:
+                name: db-postgresql
+                key: username
+          - name: DB_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: db-postgresql
+                key: user-password
+      restartPolicy: Never
+  backoffLimit: 1
