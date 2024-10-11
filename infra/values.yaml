@@ -1,5 +1,5 @@
 {
-  "staging_image_tag": "v",
+  "staging_image_tag": "v241011200140",
   "production_image_tag": "v241011183042",
   "production_revision": "74288bc04e64c2b8117d15b67f470ad42f1550ad"
 }
