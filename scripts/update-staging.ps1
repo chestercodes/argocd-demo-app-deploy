@@ -12,7 +12,7 @@ $appUrl = "https://github.com/chestercodes/$appRepo.git"
 git clone $appUrl appRepoDir
 cd appRepoDir
 
-$tags = git tag --sort=-creatordate
+$tags = @(git tag --sort=-creatordate)
 $latestTag = $tags[0]
 write-host "Latest tag is $latestTag"
 
