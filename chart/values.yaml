@@ -1,14 +1,14 @@
-postgresql:
-  global:
-    postgresql:
-      auth:
-        username: "api"
-        database: "todoapp"
-        existingSecret: "db-postgresql"
-        secretKeys:
-          adminPasswordKey: "postgres-password"
-          userPasswordKey: "user-password"
-          #replicationPasswordKey: ""
-  nameOverride: "db"
-  commonAnnotations:
-    argocd.argoproj.io/sync-wave: "-5"
+# postgresql:
+#   global:
+#     postgresql:
+#       auth:
+#         username: "api"
+#         database: "todoapp"
+#         existingSecret: "db-postgresql"
+#         secretKeys:
+#           adminPasswordKey: "postgres-password"
+#           userPasswordKey: "user-password"
+#           #replicationPasswordKey: ""
+#   nameOverride: "db"
+#   commonAnnotations:
+#     argocd.argoproj.io/sync-wave: "-5"
